@@ -125,6 +125,7 @@ return {
 			require("dap-go").setup()
 			require("nvim-dap-virtual-text").setup()
 			local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
+			vim.keymap.set('n', '<leader>dc', function() require("dapui").close() end)
 			vim.api.nvim_create_autocmd("BufWritePre", {
 				pattern = "*.go",
 				callback = function()

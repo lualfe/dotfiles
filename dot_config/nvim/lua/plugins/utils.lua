@@ -8,6 +8,15 @@ return {
 			{ 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
 		},
 		config = function()
+			local builtin = require('telescope.builtin')
+			vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
+			vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope live grep' })
+			vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = 'Telescope oldfiles' })
+			vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' })
+			vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
+			vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = "Ir para definição" })
+			vim.keymap.set("n", "<leader>fc", function() require("telescope").extensions.file_browser.file_browser() end, { desc = "Abrir File Browser" })
+
 			require('telescope').setup{
 				pickers = {
 					find_files = {
@@ -22,8 +31,21 @@ return {
 						no_ignore = true,
 						file_ignore_patterns = { ".git/" },
 					},
+					fzf = {
+						fuzzy = true,                    -- false will only do exact matching
+						override_generic_sorter = true,  -- override the generic sorter
+						override_file_sorter = true,     -- override the file sorter
+						case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+					},
+					file_browser = {
+						theme = "dropdown",
+						hijack_netrw = true,
+					},
 				},
 			}
+
+			require('telescope').load_extension('file_browser')
+			require('telescope').load_extension('fzf')
 		end,
 	},
 	{
