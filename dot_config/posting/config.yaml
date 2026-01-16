@@ -1,0 +1,8 @@
+theme: aurora
+focus:
+  on_startup: collection
+  on_request_open: body
+editor: nvim
+keymap:
+  commands: alt+p
+  send-request: alt+enter

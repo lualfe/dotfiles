@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Garante que o Go esteja no PATH para este script
+if [[ -d /opt/homebrew/bin ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# Lista de ferramentas para instalar
+# Se você adicionar um item aqui, o hash mudará e o chezmoi rodará o script novamente
+# Ferramentas: {{ list "golang.org/x/tools/gopls@latest" "github.com" "github.com" | join " " }}
+
+tools=(
+  "golang.org/x/tools/gopls@latest"
+  "github.com/sqls-server/sqls@latest"
+  "github.com/go-delve/delve/cmd/dlv@latest"
+)
+
+echo "Instalando/Atualizando ferramentas Go..."
+for tool in "${tools[@]}"; do
+  echo "Instalando $tool"
+  go install "$tool"
+done

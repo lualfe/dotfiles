@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Garante que o pipx esteja no PATH para este script (Mac/Linux)
+if [[ -d /opt/homebrew/bin ]]; then
+    export PATH="/opt/homebrew/bin:$PATH"
+fi
+
+# Hash para detectar mudanças na lista: 
+# {{ list "sqlfluff" "tmuxp" "posting" | join " " }}
+
+packages=(
+  "sqlfluff"
+  "tmuxp"
+  "posting"
+)
+
+echo "Instalando/Atualizando ferramentas Python via pipx..."
+
+# Inicializa o pipx se necessário
+pipx ensurepath --force
+
+for pkg in "${packages[@]}"; do
+  if pipx list | grep -q "$pkg"; then
+    echo "Atualizando $pkg..."
+    pipx upgrade "$pkg"
+  else
+    echo "Instalando $pkg..."
+    pipx install "$pkg"
+  fi
+done
+

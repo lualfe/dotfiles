@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
+
+# Lista de plugins extras para clonar
+plugins=(
+  "zsh-users/zsh-autosuggestions"
+  "zsh-users/zsh-syntax-highlighting"
+)
+
+for plugin in "${plugins[@]}"; do
+  plugin_name=$(basename $plugin)
+  if [ ! -d "$ZSH_CUSTOM/plugins/$plugin_name" ]; then
+    echo "Instalando plugin $plugin_name..."
+    git clone https://github.com/$plugin "$ZSH_CUSTOM/plugins/$plugin_name"
+  fi
+done
