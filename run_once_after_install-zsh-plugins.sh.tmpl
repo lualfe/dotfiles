@@ -1,10 +1,13 @@
 #!/bin/bash
 
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  echo "Instalando Oh My Zsh..."
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended
 fi
 
 ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
+mkdir -p "$ZSH_CUSTOM/plugins"
+mkdir -p "$ZSH_CUSTOM/themes"
 
 # 1. Instala o tema Powerlevel10k
 if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
