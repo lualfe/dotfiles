@@ -1,3 +1,4 @@
+tap "gcc"
 tap "achannarasappa/tap"
 tap "danvergara/tools"
 tap "tako8ki/tap"
