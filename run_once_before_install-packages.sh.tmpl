@@ -2,7 +2,7 @@
 
 if ! command -v brew &> /dev/null; then
     echo "Instalando Homebrew..."
-    /bin/bash -c "$(curl -fsSL raw.githubusercontent.com)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
     # Adiciona o Homebrew ao PATH para a sessão atual do script (ajuste para Linux/Mac Intel/Mac Silicon)
     if [[ -d /opt/homebrew/bin ]]; then
