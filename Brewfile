@@ -1,7 +1,8 @@
-tap "gcc"
 tap "achannarasappa/tap"
 tap "danvergara/tools"
 tap "tako8ki/tap"
+# The GNU Compiler Collection
+brew "gcc"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Go programming language
