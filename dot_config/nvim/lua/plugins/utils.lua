@@ -275,4 +275,13 @@ return {
 			vim.g.db_ui_winwidth = 50
 		end,
 	},
+	{
+		'akinsho/bufferline.nvim', 
+		version = "*", 
+		dependencies = 'nvim-tree/nvim-web-devicons',
+		config = function()
+			vim.opt.termguicolors = true
+			require("bufferline").setup{}
+		end
+	},
 }
