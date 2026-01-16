@@ -3,5 +3,9 @@
 # Brewfile hash: {{ include "Brewfile" | sha256sum }}
 # O comentário acima faz o chezmoi rodar este script sempre que o Brewfile mudar.
 
+if ! command -v brew &> /dev/null; then
+    eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" 2>/dev/null
+fi
+
 echo "Atualizando pacotes do Homebrew..."
-brew bundle --global --file={{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
+brew bundle --file={{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
