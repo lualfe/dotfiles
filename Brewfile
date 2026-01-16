@@ -35,6 +35,8 @@ brew "tree-sitter"
 brew "tree-sitter-cli"
 # Terminal stock ticker with live updates and position tracking
 brew "achannarasappa/tap/ticker"
+# Kubernetes command-line tool
+brew "kubernetes-cli"
 # Terminal-based AI coding assistant
 cask "claude-code"
 # Universal database tool and SQL client
