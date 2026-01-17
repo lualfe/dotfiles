@@ -55,7 +55,6 @@ return {
 	{
 		'goolord/alpha-nvim',
 		config = function ()
-			vim.api.nvim_set_hl(0, "AlphaButton", { fg = "#ff5555" })
 			-- Dracula theme colors gradient (purple -> pink -> cyan)
 			vim.api.nvim_set_hl(0, "GreyComment", { fg = "#6272a4" }) -- comment
 			vim.api.nvim_set_hl(0, "Pink_1", { fg = "#ff79c6" }) -- pink
@@ -161,6 +160,26 @@ return {
 					      ' ', ' ', ' ', ' ', ' ', ' ', ' ',
 				      }
 				      pcall(vim.cmd.AlphaRedraw)
+			      end,
+		      })
+
+		      local toggle_bufferline = vim.api.nvim_create_augroup("ToggleBufferline", { clear = true })
+
+		      vim.api.nvim_create_autocmd("User", {
+			      pattern = "AlphaReady",
+			      group = toggle_bufferline,
+			      callback = function()
+				      vim.opt.showtabline = 0
+			      end,
+		      })
+		      vim.api.nvim_create_autocmd("BufUnload", {
+			      buffer = 0,
+			      group = toggle_bufferline,
+			      callback = function()
+				      -- Verifica se o buffer sendo fechado é do tipo 'alpha'
+				      if vim.bo.filetype == "alpha" then
+					      vim.opt.showtabline = 2
+				      end
 			      end,
 		      })
 		      dashboard.opts.opts.noautocmd = true
