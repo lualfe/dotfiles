@@ -201,8 +201,8 @@ level = 1
 #
 # You can also set family on root to overwrite all fonts.
 [fonts]
-family = "DaddyTimeMono Nerd Font Mono"
-size = 13
+family = "Iosevka Nerd Font Mono"
+size = 14
 #
 # You can also specify extra fonts to load
 # [fonts]
