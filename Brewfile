@@ -42,7 +42,7 @@ cask "claude-code"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 brew "node"
-cask "iterm2"
+cask "rio"
 cask "font-daddy-time-mono-nerd-font"
 cask "docker-desktop"
 cask "orbstack"
