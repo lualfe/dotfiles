@@ -41,7 +41,11 @@ return {
 			-- Opcional: Configurações de UI quando um LSP é anexado
 			vim.api.nvim_create_autocmd('LspAttach', {
 				callback = function(args)
-					-- Seus atalhos de teclado (keymaps) LSP entram aqui
+					local buf = args.buf
+					vim.keymap.set('n', 'gI', vim.lsp.buf.implementation, { buffer = buf, desc = "Ir para implementação" })
+					vim.keymap.set('n', '<leader>gI', '<cmd>Telescope lsp_implementations<CR>', { buffer = buf, desc = "Telescope implementações" })
+					vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = buf, desc = "Referências" })
+					vim.keymap.set('n', '<leader>gr', '<cmd>Telescope lsp_references<CR>', { buffer = buf, desc = "Telescope referências" })
 				end,
 			})
 
@@ -134,11 +138,26 @@ return {
 				group = format_sync_grp,
 			})
 
+			vim.api.nvim_create_autocmd("User", {
+				pattern = "DapProgressUpdate",
+				callback = function()
+					vim.fn.sign_define('DapBreakpoint', { text='󰠭', texthl='DapBreakpointColor', linehl='DapBreakpointLine', numhl='DapBreakpointLine', priority=20 })
+					vim.fn.sign_define("DapStopped", {text="🖕", texthl="DiagnosticWarn", linehl="DapStoppedLine", numhl="DapStoppedLine", priority=20 })
+					vim.api.nvim_set_hl(0, 'DapBreakpointColor', { fg = '#ff0000' })
+					vim.api.nvim_set_hl(0, 'DiagnosticWarn', { fg = '#ba03fc' })
+					vim.api.nvim_set_hl(0, 'DapBreakpointLine', { bg = "#3a2727" })
+					vim.api.nvim_set_hl(0, "DapStoppedLine", { bg = "#2e3b2e" })
+				end
+			})
+
+
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = "go",
 				callback = function()
-					vim.fn.sign_define('DapBreakpoint', { text='󰠭', texthl='DapBreakpointColor', linehl='DapBreakpointLine', numhl='DapBreakpointLine' })
-					vim.fn.sign_define("DapStopped", {text="🖕", texthl="DiagnosticWarn", linehl="DapStoppedLine", numhl="DapStoppedLine"})
+					vim.opt_local.swapfile = false
+
+					vim.fn.sign_define('DapBreakpoint', { text='󰠭', texthl='DapBreakpointColor', linehl='DapBreakpointLine', numhl='DapBreakpointLine', priority=20 })
+					vim.fn.sign_define("DapStopped", {text="🖕", texthl="DiagnosticWarn", linehl="DapStoppedLine", numhl="DapStoppedLine", priority=20 })
 					vim.api.nvim_set_hl(0, 'DapBreakpointColor', { fg = '#ff0000' })
 					vim.api.nvim_set_hl(0, 'DiagnosticWarn', { fg = '#ba03fc' })
 					vim.api.nvim_set_hl(0, 'DapBreakpointLine', { bg = "#3a2727" })
