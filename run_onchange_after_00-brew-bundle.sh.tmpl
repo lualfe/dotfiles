@@ -1,11 +1,132 @@
 #!/bin/bash
+set -e
 
 # Brewfile hash: {{ include "Brewfile" | sha256sum }}
-# O comentário acima faz o chezmoi rodar este script sempre que o Brewfile mudar.
+# ubuntu-packages.txt hash: {{ include "ubuntu-packages.txt" | sha256sum }}
 
-if ! command -v brew &> /dev/null; then
-    eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" 2>/dev/null
+OS="$(uname -s)"
+
+if [[ "$OS" == "Darwin" ]]; then
+    if ! command -v brew &> /dev/null; then
+        eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" 2>/dev/null
+    fi
+    echo "Atualizando pacotes do Homebrew..."
+    brew bundle --file={{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
+
+elif [[ "$OS" == "Linux" ]]; then
+    . /etc/os-release
+    if [[ "$ID" == "ubuntu" ]]; then
+        echo "Instalando pacotes apt para Ubuntu..."
+
+        # Pacotes base (ubuntu-packages.txt)
+        xargs sudo apt-get install -y < {{ joinPath .chezmoi.sourceDir "ubuntu-packages.txt" | quote }}
+
+        # fd symlink (Ubuntu usa fdfind como binário)
+        if ! command -v fd &> /dev/null; then
+            sudo ln -sf /usr/bin/fdfind /usr/local/bin/fd
+        fi
+
+        # Pacotes com repositórios externos
+        sudo apt-get install -y \
+            postgresql-15 \
+            kubectl \
+            docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+        # lazygit
+        if ! command -v lazygit &> /dev/null; then
+            echo "Instalando lazygit..."
+            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" \
+                | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+            curl -Lo /tmp/lazygit.tar.gz \
+                "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+            tar -xzf /tmp/lazygit.tar.gz -C /tmp lazygit
+            sudo install /tmp/lazygit /usr/local/bin
+            rm -f /tmp/lazygit.tar.gz /tmp/lazygit
+        fi
+
+        # golang-migrate
+        if ! command -v migrate &> /dev/null; then
+            echo "Instalando golang-migrate..."
+            curl -Lo /tmp/migrate.tar.gz \
+                "https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz"
+            tar -xzf /tmp/migrate.tar.gz -C /tmp migrate
+            sudo install /tmp/migrate /usr/local/bin
+            rm -f /tmp/migrate.tar.gz /tmp/migrate
+        fi
+
+        # rainfrog (danvergara/tools tap → achristmascarl/rainfrog)
+        if ! command -v rainfrog &> /dev/null; then
+            echo "Instalando rainfrog..."
+            RAINFROG_VERSION=$(curl -s "https://api.github.com/repos/achristmascarl/rainfrog/releases/latest" \
+                | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+            curl -Lo /tmp/rainfrog.tar.gz \
+                "https://github.com/achristmascarl/rainfrog/releases/latest/download/rainfrog-v${RAINFROG_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+            tar -xzf /tmp/rainfrog.tar.gz -C /tmp
+            sudo install /tmp/rainfrog /usr/local/bin
+            rm -f /tmp/rainfrog.tar.gz /tmp/rainfrog
+        fi
+
+        # ticker
+        if ! command -v ticker &> /dev/null; then
+            echo "Instalando ticker..."
+            curl -Lo /tmp/ticker.tar.gz \
+                "https://github.com/achannarasappa/ticker/releases/latest/download/ticker_linux_amd64.tar.gz"
+            tar -xzf /tmp/ticker.tar.gz -C /tmp ticker
+            sudo install /tmp/ticker /usr/local/bin
+            rm -f /tmp/ticker.tar.gz /tmp/ticker
+        fi
+
+        # resterm (via go install)
+        if command -v go &> /dev/null && ! command -v resterm &> /dev/null; then
+            echo "Instalando resterm..."
+            go install github.com/unkn0wn-root/resterm/cmd/resterm@latest
+        fi
+
+        # tree-sitter CLI (via npm)
+        if command -v npm &> /dev/null && ! command -v tree-sitter &> /dev/null; then
+            echo "Instalando tree-sitter-cli..."
+            sudo npm install -g tree-sitter-cli
+        fi
+
+        # claude-code (via npm)
+        if command -v npm &> /dev/null && ! command -v claude &> /dev/null; then
+            echo "Instalando claude-code..."
+            sudo npm install -g @anthropic-ai/claude-code
+        fi
+
+        # rio terminal (.deb do GitHub)
+        if ! command -v rio &> /dev/null; then
+            echo "Instalando rio terminal..."
+            RIO_VERSION=$(curl -s "https://api.github.com/repos/raphamorim/rio/releases/latest" \
+                | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+            curl -Lo /tmp/rio.deb \
+                "https://github.com/raphamorim/rio/releases/latest/download/rio_${RIO_VERSION}_amd64.deb"
+            sudo dpkg -i /tmp/rio.deb || sudo apt-get install -f -y
+            rm -f /tmp/rio.deb
+        fi
+
+        # dbeaver-community (.deb do GitHub)
+        if ! dpkg -l dbeaver-ce &> /dev/null; then
+            echo "Instalando DBeaver Community..."
+            curl -Lo /tmp/dbeaver.deb \
+                "https://github.com/dbeaver/dbeaver/releases/latest/download/dbeaver-ce_latest_amd64.deb"
+            sudo dpkg -i /tmp/dbeaver.deb || sudo apt-get install -f -y
+            rm -f /tmp/dbeaver.deb
+        fi
+
+        # Iosevka Nerd Font
+        if [[ ! -f "$HOME/.local/share/fonts/IosevkaNerdFont-Regular.ttf" ]]; then
+            echo "Instalando Iosevka Nerd Font..."
+            mkdir -p "$HOME/.local/share/fonts"
+            curl -Lo /tmp/Iosevka.tar.xz \
+                "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Iosevka.tar.xz"
+            tar -xJf /tmp/Iosevka.tar.xz -C "$HOME/.local/share/fonts"
+            fc-cache -f -v
+            rm -f /tmp/Iosevka.tar.xz
+        fi
+
+        # Deletar Brewfile no Linux
+        rm -f "$HOME/Brewfile"
+        echo "Instalação Ubuntu concluída!"
+    fi
 fi
-
-echo "Atualizando pacotes do Homebrew..."
-brew bundle --file={{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}

@@ -3,6 +3,10 @@
 # Garante que o Go esteja no PATH para este script
 if [[ -d /opt/homebrew/bin ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -d /usr/local/go/bin ]]; then
+    export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
+else
+    export PATH="$HOME/go/bin:$PATH"
 fi
 
 # Lista de ferramentas para instalar

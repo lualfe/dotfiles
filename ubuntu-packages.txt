@@ -1,0 +1,9 @@
+gcc
+fd-find
+golang-go
+libyaml-dev
+neovim
+pipx
+tmux
+nodejs
+libtree-sitter-dev
