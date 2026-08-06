@@ -33,8 +33,6 @@ brew "tmux"
 brew "tree-sitter"
 # Parser generator tool
 brew "tree-sitter-cli"
-# Terminal stock ticker with live updates and position tracking
-brew "achannarasappa/tap/ticker"
 # Kubernetes command-line tool
 brew "kubernetes-cli"
 # Terminal-based AI coding assistant

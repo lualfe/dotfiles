@@ -66,16 +66,6 @@ elif [[ "$OS" == "Linux" ]]; then
             rm -f /tmp/rainfrog.tar.gz /tmp/rainfrog
         fi
 
-        # ticker
-        if ! command -v ticker &> /dev/null; then
-            echo "Instalando ticker..."
-            curl -Lo /tmp/ticker.tar.gz \
-                "https://github.com/achannarasappa/ticker/releases/latest/download/ticker_linux_amd64.tar.gz"
-            tar -xzf /tmp/ticker.tar.gz -C /tmp ticker
-            sudo install /tmp/ticker /usr/local/bin
-            rm -f /tmp/ticker.tar.gz /tmp/ticker
-        fi
-
         # resterm (via go install)
         if command -v go &> /dev/null && ! command -v resterm &> /dev/null; then
             echo "Instalando resterm..."
