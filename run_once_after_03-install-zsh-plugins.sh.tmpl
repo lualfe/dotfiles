@@ -28,3 +28,13 @@ for plugin in "${plugins[@]}"; do
     git clone https://github.com/$plugin "$ZSH_CUSTOM/plugins/$plugin_name"
   fi
 done
+
+# CHSH=no acima pula a troca de shell padrão; no Linux o zsh não vem
+# como shell padrão (diferente do macOS), então define explicitamente.
+if [[ "$(uname -s)" == "Linux" ]] && [[ "$SHELL" != *"zsh"* ]]; then
+  ZSH_BIN=$(command -v zsh)
+  if [[ -n "$ZSH_BIN" ]]; then
+    echo "Definindo zsh como shell padrão..."
+    sudo chsh -s "$ZSH_BIN" "$USER"
+  fi
+fi

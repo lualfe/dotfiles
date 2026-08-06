@@ -87,21 +87,29 @@ elif [[ "$OS" == "Linux" ]]; then
         # rio terminal (.deb do GitHub)
         if ! command -v rio &> /dev/null; then
             echo "Instalando rio terminal..."
-            RIO_VERSION=$(curl -s "https://api.github.com/repos/raphamorim/rio/releases/latest" \
-                | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
-            curl -Lo /tmp/rio.deb \
-                "https://github.com/raphamorim/rio/releases/latest/download/rio_${RIO_VERSION}_amd64.deb"
-            sudo dpkg -i /tmp/rio.deb || sudo apt-get install -f -y
-            rm -f /tmp/rio.deb
+            RIO_DEB_URL=$(curl -s "https://api.github.com/repos/raphamorim/rio/releases/latest" \
+                | grep '"browser_download_url"' | grep 'amd64_x11\.deb' | cut -d '"' -f 4)
+            if [[ -n "$RIO_DEB_URL" ]]; then
+                curl -Lo /tmp/rio.deb "$RIO_DEB_URL"
+                sudo dpkg -i /tmp/rio.deb || sudo apt-get install -f -y
+                rm -f /tmp/rio.deb
+            else
+                echo "AVISO: não encontrei o .deb do rio no último release, pulando." >&2
+            fi
         fi
 
         # dbeaver-community (.deb do GitHub)
         if ! dpkg -l dbeaver-ce &> /dev/null; then
             echo "Instalando DBeaver Community..."
-            curl -Lo /tmp/dbeaver.deb \
-                "https://github.com/dbeaver/dbeaver/releases/latest/download/dbeaver-ce_latest_amd64.deb"
-            sudo dpkg -i /tmp/dbeaver.deb || sudo apt-get install -f -y
-            rm -f /tmp/dbeaver.deb
+            DBEAVER_DEB_URL=$(curl -s "https://api.github.com/repos/dbeaver/dbeaver/releases/latest" \
+                | grep '"browser_download_url"' | grep 'linux-x86_64\.deb' | cut -d '"' -f 4)
+            if [[ -n "$DBEAVER_DEB_URL" ]]; then
+                curl -Lo /tmp/dbeaver.deb "$DBEAVER_DEB_URL"
+                sudo dpkg -i /tmp/dbeaver.deb || sudo apt-get install -f -y
+                rm -f /tmp/dbeaver.deb
+            else
+                echo "AVISO: não encontrei o .deb do DBeaver no último release, pulando." >&2
+            fi
         fi
 
         # Iosevka Nerd Font

@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+# dot_zshrc hash: {{ include "dot_zshrc" | sha256sum }}
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+    . /etc/os-release
+    if [[ "$ID" == "ubuntu" ]]; then
+        ZSHRC="$HOME/.zshrc"
+        if [[ -f "$ZSHRC" ]]; then
+            echo "Limpando configs do zshrc que não fazem sentido no Linux..."
+            sed -i \
+                -e '/\/opt\/homebrew/ s/^/# [linux-skip] /' \
+                -e '/\/home\/linuxbrew/ s/^/# [linux-skip] /' \
+                -e '/\/Applications\//     s/^/# [linux-skip] /' \
+                "$ZSHRC"
+        fi
+    fi
+fi
