@@ -28,11 +28,14 @@ elif [[ "$OS" == "Linux" ]]; then
         # Pacotes base (sem exigência de versão específica, apt resolve bem)
         sudo apt-get install -y \
             gcc \
+            make \
             zsh \
             libyaml-dev \
             tmux \
             nodejs \
             libtree-sitter-dev \
+            fontconfig \
+            fzf \
             pipx
 
         # fd-find (apt fica desatualizado, instala o binário mais recente do GitHub)

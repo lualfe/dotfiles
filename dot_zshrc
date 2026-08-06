@@ -125,8 +125,7 @@ export NVM_DIR="$HOME/.nvm"
 
 export DISABLE_AUTO_TITLE='true'
 
-# Created by `pipx` on 2026-01-08 23:17:30
-export PATH="$PATH:/Users/lualfe/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 export PATH=$PATH:$HOME/go/bin
 export RAINFROG_CONFIG=~/.config/rainfrog/rainfrog_config.yaml
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"

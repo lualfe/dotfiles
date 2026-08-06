@@ -17,8 +17,10 @@ packages=(
 
 echo "Instalando/Atualizando ferramentas Python via pipx..."
 
-# Inicializa o pipx se necessário
-pipx ensurepath --force
+# ~/.local/bin já é exportado no PATH via dot_zshrc (não usar `pipx
+# ensurepath`: ele mexe direto no ~/.zshrc no disco, e o chezmoi
+# sobrescreve esse arquivo a partir do source a cada apply, perdendo
+# a alteração depois da primeira execução).
 
 for pkg in "${packages[@]}"; do
   if pipx list | grep -q "$pkg"; then
