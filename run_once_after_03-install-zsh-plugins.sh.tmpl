@@ -31,10 +31,22 @@ done
 
 # CHSH=no acima pula a troca de shell padrão; no Linux o zsh não vem
 # como shell padrão (diferente do macOS), então define explicitamente.
-if [[ "$(uname -s)" == "Linux" ]] && [[ "$SHELL" != *"zsh"* ]]; then
+# Obs: só vale a partir do próximo login (logout/login ou reboot),
+# não numa nova aba/janela de terminal dentro da mesma sessão.
+if [[ "$(uname -s)" == "Linux" ]]; then
+  CURRENT_USER=$(id -un)
+  CURRENT_SHELL=$(getent passwd "$CURRENT_USER" | cut -d: -f7)
   ZSH_BIN=$(command -v zsh)
-  if [[ -n "$ZSH_BIN" ]]; then
-    echo "Definindo zsh como shell padrão..."
-    sudo chsh -s "$ZSH_BIN" "$USER"
+  if [[ -n "$ZSH_BIN" ]] && [[ "$CURRENT_SHELL" != "$ZSH_BIN" ]]; then
+    if ! grep -qxF "$ZSH_BIN" /etc/shells 2>/dev/null; then
+      echo "Registrando $ZSH_BIN em /etc/shells..."
+      echo "$ZSH_BIN" | sudo tee -a /etc/shells > /dev/null
+    fi
+    echo "Definindo zsh como shell padrão para $CURRENT_USER..."
+    if sudo chsh -s "$ZSH_BIN" "$CURRENT_USER"; then
+      echo "Shell padrão alterado. Faça logout/login (ou reboot) para valer."
+    else
+      echo "AVISO: falha ao trocar shell padrão via chsh." >&2
+    fi
   fi
 fi

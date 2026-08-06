@@ -2,7 +2,6 @@
 set -e
 
 # Brewfile hash: {{ include "Brewfile" | sha256sum }}
-# ubuntu-packages.txt hash: {{ include "ubuntu-packages.txt" | sha256sum }}
 
 OS="$(uname -s)"
 
@@ -18,12 +17,36 @@ elif [[ "$OS" == "Linux" ]]; then
     if [[ "$ID" == "ubuntu" ]]; then
         echo "Instalando pacotes apt para Ubuntu..."
 
-        # Pacotes base (ubuntu-packages.txt)
-        xargs sudo apt-get install -y < {{ joinPath .chezmoi.sourceDir "ubuntu-packages.txt" | quote }}
+        # Arquitetura do sistema (amd64/arm64)
+        DEB_ARCH=$(dpkg --print-architecture)
+        case "$DEB_ARCH" in
+            amd64) GNU_ARCH="x86_64" ;;
+            arm64) GNU_ARCH="aarch64" ;;
+            *) GNU_ARCH="$DEB_ARCH" ;;
+        esac
 
-        # fd symlink (Ubuntu usa fdfind como binário)
-        if ! command -v fd &> /dev/null; then
-            sudo ln -sf /usr/bin/fdfind /usr/local/bin/fd
+        # Pacotes base (sem exigência de versão específica, apt resolve bem)
+        sudo apt-get install -y \
+            gcc \
+            zsh \
+            libyaml-dev \
+            tmux \
+            nodejs \
+            libtree-sitter-dev \
+            pipx
+
+        # fd-find (apt fica desatualizado, instala o binário mais recente do GitHub)
+        FD_LATEST=$(curl -s "https://api.github.com/repos/sharkdp/fd/releases/latest" \
+            | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+        FD_CURRENT=$(command -v fd &> /dev/null && fd --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0")
+        if [[ -n "$FD_LATEST" ]] && [[ "$FD_CURRENT" != "$FD_LATEST" ]]; then
+            echo "Instalando fd $FD_LATEST (arch: $DEB_ARCH)..."
+            FD_DIRNAME="fd-v${FD_LATEST}-${GNU_ARCH}-unknown-linux-gnu"
+            curl -Lo /tmp/fd.tar.gz \
+                "https://github.com/sharkdp/fd/releases/latest/download/${FD_DIRNAME}.tar.gz"
+            tar -xzf /tmp/fd.tar.gz -C /tmp
+            sudo install "/tmp/${FD_DIRNAME}/fd" /usr/local/bin/fd
+            rm -rf /tmp/fd.tar.gz "/tmp/${FD_DIRNAME}"
         fi
 
         # Pacotes com repositórios externos
@@ -32,13 +55,44 @@ elif [[ "$OS" == "Linux" ]]; then
             kubectl \
             docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+        # Go (apt fica desatualizado, instala o binário oficial mais recente)
+        GO_LATEST=$(curl -s "https://go.dev/dl/?mode=json" | grep -m1 '"version"' | sed -E 's/.*"go([^"]+)".*/\1/')
+        GO_CURRENT=$(command -v go &> /dev/null && go version | grep -oE 'go[0-9]+\.[0-9]+(\.[0-9]+)?' | sed 's/^go//' || echo "0.0.0")
+        if [[ -n "$GO_LATEST" ]] && [[ "$GO_CURRENT" != "$GO_LATEST" ]]; then
+            echo "Instalando Go $GO_LATEST (arch: $DEB_ARCH)..."
+            sudo apt-get remove -y golang-go &> /dev/null || true
+            curl -Lo /tmp/go.tar.gz "https://go.dev/dl/go${GO_LATEST}.linux-${DEB_ARCH}.tar.gz"
+            sudo rm -rf /usr/local/go
+            sudo tar -xzf /tmp/go.tar.gz -C /usr/local
+            sudo ln -sf /usr/local/go/bin/go /usr/local/bin/go
+            sudo ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+            rm -f /tmp/go.tar.gz
+        fi
+
+        # neovim (apt fica desatualizado; plugins pedem 0.11+, então instala o binário oficial)
+        NVIM_MIN="0.11.0"
+        NVIM_CURRENT=$(command -v nvim &> /dev/null && nvim --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0")
+        if [[ "$NVIM_CURRENT" == "0.0.0" ]] || [[ "$(printf '%s\n' "$NVIM_MIN" "$NVIM_CURRENT" | sort -V | head -1)" != "$NVIM_MIN" ]]; then
+            echo "Instalando neovim mais recente (arch: $DEB_ARCH)..."
+            sudo apt-get remove -y neovim &> /dev/null || true
+            NVIM_ARCH=$([[ "$DEB_ARCH" == "amd64" ]] && echo "x86_64" || echo "arm64")
+            curl -Lo /tmp/nvim.tar.gz \
+                "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${NVIM_ARCH}.tar.gz"
+            sudo rm -rf /opt/nvim "/opt/nvim-linux-${NVIM_ARCH}"
+            sudo tar -xzf /tmp/nvim.tar.gz -C /opt
+            sudo mv "/opt/nvim-linux-${NVIM_ARCH}" /opt/nvim
+            sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+            rm -f /tmp/nvim.tar.gz
+        fi
+
         # lazygit
         if ! command -v lazygit &> /dev/null; then
-            echo "Instalando lazygit..."
+            echo "Instalando lazygit (arch: $DEB_ARCH)..."
             LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" \
                 | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+            LAZYGIT_ARCH=$([[ "$DEB_ARCH" == "amd64" ]] && echo "x86_64" || echo "arm64")
             curl -Lo /tmp/lazygit.tar.gz \
-                "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+                "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_linux_${LAZYGIT_ARCH}.tar.gz"
             tar -xzf /tmp/lazygit.tar.gz -C /tmp lazygit
             sudo install /tmp/lazygit /usr/local/bin
             rm -f /tmp/lazygit.tar.gz /tmp/lazygit
@@ -46,9 +100,9 @@ elif [[ "$OS" == "Linux" ]]; then
 
         # golang-migrate
         if ! command -v migrate &> /dev/null; then
-            echo "Instalando golang-migrate..."
+            echo "Instalando golang-migrate (arch: $DEB_ARCH)..."
             curl -Lo /tmp/migrate.tar.gz \
-                "https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz"
+                "https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-${DEB_ARCH}.tar.gz"
             tar -xzf /tmp/migrate.tar.gz -C /tmp migrate
             sudo install /tmp/migrate /usr/local/bin
             rm -f /tmp/migrate.tar.gz /tmp/migrate
@@ -56,11 +110,11 @@ elif [[ "$OS" == "Linux" ]]; then
 
         # rainfrog (danvergara/tools tap → achristmascarl/rainfrog)
         if ! command -v rainfrog &> /dev/null; then
-            echo "Instalando rainfrog..."
+            echo "Instalando rainfrog (arch: $DEB_ARCH)..."
             RAINFROG_VERSION=$(curl -s "https://api.github.com/repos/achristmascarl/rainfrog/releases/latest" \
                 | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
             curl -Lo /tmp/rainfrog.tar.gz \
-                "https://github.com/achristmascarl/rainfrog/releases/latest/download/rainfrog-v${RAINFROG_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+                "https://github.com/achristmascarl/rainfrog/releases/latest/download/rainfrog-v${RAINFROG_VERSION}-${GNU_ARCH}-unknown-linux-gnu.tar.gz"
             tar -xzf /tmp/rainfrog.tar.gz -C /tmp
             sudo install /tmp/rainfrog /usr/local/bin
             rm -f /tmp/rainfrog.tar.gz /tmp/rainfrog
@@ -86,29 +140,29 @@ elif [[ "$OS" == "Linux" ]]; then
 
         # rio terminal (.deb do GitHub)
         if ! command -v rio &> /dev/null; then
-            echo "Instalando rio terminal..."
+            echo "Instalando rio terminal (arch: $DEB_ARCH)..."
             RIO_DEB_URL=$(curl -s "https://api.github.com/repos/raphamorim/rio/releases/latest" \
-                | grep '"browser_download_url"' | grep 'amd64_x11\.deb' | cut -d '"' -f 4)
+                | grep '"browser_download_url"' | grep "${DEB_ARCH}_x11\.deb" | cut -d '"' -f 4)
             if [[ -n "$RIO_DEB_URL" ]]; then
                 curl -Lo /tmp/rio.deb "$RIO_DEB_URL"
                 sudo dpkg -i /tmp/rio.deb || sudo apt-get install -f -y
                 rm -f /tmp/rio.deb
             else
-                echo "AVISO: não encontrei o .deb do rio no último release, pulando." >&2
+                echo "AVISO: não encontrei o .deb do rio para $DEB_ARCH no último release, pulando." >&2
             fi
         fi
 
         # dbeaver-community (.deb do GitHub)
         if ! dpkg -l dbeaver-ce &> /dev/null; then
-            echo "Instalando DBeaver Community..."
+            echo "Instalando DBeaver Community (arch: $DEB_ARCH)..."
             DBEAVER_DEB_URL=$(curl -s "https://api.github.com/repos/dbeaver/dbeaver/releases/latest" \
-                | grep '"browser_download_url"' | grep 'linux-x86_64\.deb' | cut -d '"' -f 4)
+                | grep '"browser_download_url"' | grep "linux-${GNU_ARCH}\.deb" | cut -d '"' -f 4)
             if [[ -n "$DBEAVER_DEB_URL" ]]; then
                 curl -Lo /tmp/dbeaver.deb "$DBEAVER_DEB_URL"
                 sudo dpkg -i /tmp/dbeaver.deb || sudo apt-get install -f -y
                 rm -f /tmp/dbeaver.deb
             else
-                echo "AVISO: não encontrei o .deb do DBeaver no último release, pulando." >&2
+                echo "AVISO: não encontrei o .deb do DBeaver para $DEB_ARCH no último release, pulando." >&2
             fi
         fi
 
