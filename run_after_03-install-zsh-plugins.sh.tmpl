@@ -15,19 +15,15 @@ ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
 echo "DEBUG ZSH_CUSTOM resolvido: $ZSH_CUSTOM"
 mkdir -p "$ZSH_CUSTOM/plugins"
 mkdir -p "$ZSH_CUSTOM/themes"
-echo "DEBUG conteúdo de $ZSH_CUSTOM/themes: $(ls -A "$ZSH_CUSTOM/themes" 2>&1)"
-echo "DEBUG conteúdo de $ZSH_CUSTOM/plugins: $(ls -A "$ZSH_CUSTOM/plugins" 2>&1)"
 
-# 1. Instala o tema Powerlevel10k
-# (checa se o dir tem conteúdo, não só se existe: um clone que falhou
-# no meio deixa o dir criado mas vazio, e um `-d` simples nunca mais
-# tentaria de novo já que este script só roda uma vez por conteúdo)
-if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ] || [ -z "$(ls -A "$ZSH_CUSTOM/themes/powerlevel10k" 2>/dev/null)" ]; then
-  echo "Instalando Powerlevel10k..."
-  rm -rf "$ZSH_CUSTOM/themes/powerlevel10k"
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
-  echo ""
-fi
+# 1. Tema Powerlevel10k — reinstala do zero sempre, sem checar se já
+# existe (script já roda em todo `chezmoi apply`, então o custo é só
+# um git clone a mais, e isso elimina qualquer chance de ficar com
+# um clone incompleto/corrompido travado para sempre).
+echo "Instalando Powerlevel10k..."
+rm -rf "$ZSH_CUSTOM/themes/powerlevel10k"
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
+echo ""
 
 # Lista de plugins extras para clonar
 plugins=(
@@ -38,12 +34,10 @@ plugins=(
 for plugin in "${plugins[@]}"; do
   plugin_name=$(basename $plugin)
   plugin_dir="$ZSH_CUSTOM/plugins/$plugin_name"
-  if [ ! -d "$plugin_dir" ] || [ -z "$(ls -A "$plugin_dir" 2>/dev/null)" ]; then
-    echo "Instalando plugin $plugin_name..."
-    rm -rf "$plugin_dir"
-    git clone "https://github.com/$plugin" "$plugin_dir"
-    echo ""
-  fi
+  echo "Instalando plugin $plugin_name..."
+  rm -rf "$plugin_dir"
+  git clone "https://github.com/$plugin" "$plugin_dir"
+  echo ""
 done
 
 # CHSH=no acima pula a troca de shell padrão; no Linux o zsh não vem
