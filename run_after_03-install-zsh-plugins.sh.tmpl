@@ -2,6 +2,9 @@
 
 echo ">>> INICIO: 03-install-zsh-plugins"
 
+echo "DEBUG usuário: $(id -un)"
+echo "DEBUG HOME: $HOME"
+
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   echo "Instalando Oh My Zsh..."
   CHSH=no RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
@@ -9,8 +12,11 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
 fi
 
 ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
+echo "DEBUG ZSH_CUSTOM resolvido: $ZSH_CUSTOM"
 mkdir -p "$ZSH_CUSTOM/plugins"
 mkdir -p "$ZSH_CUSTOM/themes"
+echo "DEBUG conteúdo de $ZSH_CUSTOM/themes: $(ls -A "$ZSH_CUSTOM/themes" 2>&1)"
+echo "DEBUG conteúdo de $ZSH_CUSTOM/plugins: $(ls -A "$ZSH_CUSTOM/plugins" 2>&1)"
 
 # 1. Instala o tema Powerlevel10k
 # (checa se o dir tem conteúdo, não só se existe: um clone que falhou
