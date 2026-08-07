@@ -54,7 +54,7 @@ elif [[ "$OS" == "Linux" ]]; then
         fi
 
         # NodeSource (Node.js LTS)
-        if [[ ! -f /etc/apt/sources.list.d/nodesource.list ]]; then
+        if [[ ! -f /etc/apt/sources.list.d/nodesource.sources ]]; then
             echo "Adicionando repositório NodeSource..."
             curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
         fi

@@ -10,8 +10,8 @@ else
 fi
 
 # Lista de ferramentas para instalar
-# Se você adicionar um item aqui, o hash mudará e o chezmoi rodará o script novamente
-# Ferramentas: {{ list "golang.org/x/tools/gopls@latest" "github.com" "github.com" | join " " }}
+# Se você adicionar um item aqui, o hash muda e o chezmoi roda o script de novo
+# Ferramentas: {{ list "golang.org/x/tools/gopls@latest" "github.com/sqls-server/sqls@latest" "github.com/go-delve/delve/cmd/dlv@latest" | join " " }}
 
 tools=(
   "golang.org/x/tools/gopls@latest"
