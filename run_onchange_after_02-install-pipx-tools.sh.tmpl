@@ -1,12 +1,17 @@
 #!/bin/bash
 
+SEP="=================================================="
+echo "$SEP"
+echo ">>> INICIO: 02-install-pipx-tools"
+echo "$SEP"
+
 # Garante que o pipx esteja no PATH para este script (Mac/Linux)
 if [[ -d /opt/homebrew/bin ]]; then
     export PATH="/opt/homebrew/bin:$PATH"
 fi
 export PATH="$HOME/.local/bin:$PATH"
 
-# Hash para detectar mudanças na lista: 
+# Hash para detectar mudanças na lista:
 # {{ list "sqlfluff" "tmuxp" "posting" | join " " }}
 
 packages=(
@@ -22,6 +27,7 @@ echo "Instalando/Atualizando ferramentas Python via pipx..."
 # sobrescreve esse arquivo a partir do source a cada apply, perdendo
 # a alteração depois da primeira execução).
 
+echo "$SEP"
 # Uma instalação pipx interrompida (rede, VM derrubada no meio, etc)
 # deixa um venv com pipx_metadata.json vazio/inválido. Isso quebra
 # `pipx list` para TODOS os pacotes (não só o corrompido), então
@@ -43,7 +49,11 @@ fi
 # list` (frágil, como visto acima) e se auto-corrige sozinho caso o
 # venv de um pacote específico esteja corrompido.
 for pkg in "${packages[@]}"; do
+  echo "$SEP"
   echo "Instalando/atualizando $pkg..."
   pipx install --force "$pkg"
 done
 
+echo "$SEP"
+echo ">>> FIM: 02-install-pipx-tools"
+echo "$SEP"

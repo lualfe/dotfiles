@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+SEP="=================================================="
+echo "$SEP"
+echo ">>> INICIO: 00-install-packages"
+echo "$SEP"
+
 OS="$(uname -s)"
 
 if [[ "$OS" == "Darwin" ]]; then
@@ -18,11 +23,13 @@ if [[ "$OS" == "Darwin" ]]; then
 elif [[ "$OS" == "Linux" ]]; then
     . /etc/os-release
     if [[ "$ID" == "ubuntu" ]]; then
+        echo "$SEP"
         echo "Configurando repositórios apt para Ubuntu..."
 
         sudo apt-get update -qq
         sudo apt-get install -y curl gnupg ca-certificates apt-transport-https lsb-release
 
+        echo "$SEP"
         # PostgreSQL 15
         if [[ ! -f /etc/apt/sources.list.d/pgdg.list ]]; then
             echo "Adicionando repositório PostgreSQL..."
@@ -32,6 +39,7 @@ elif [[ "$OS" == "Linux" ]]; then
                 | sudo tee /etc/apt/sources.list.d/pgdg.list
         fi
 
+        echo "$SEP"
         # Kubernetes (kubectl)
         if [[ ! -f /etc/apt/sources.list.d/kubernetes.list ]]; then
             echo "Adicionando repositório Kubernetes..."
@@ -42,6 +50,7 @@ elif [[ "$OS" == "Linux" ]]; then
                 | sudo tee /etc/apt/sources.list.d/kubernetes.list
         fi
 
+        echo "$SEP"
         # Docker Engine
         if [[ ! -f /etc/apt/sources.list.d/docker.list ]]; then
             echo "Adicionando repositório Docker..."
@@ -53,13 +62,19 @@ elif [[ "$OS" == "Linux" ]]; then
                 | sudo tee /etc/apt/sources.list.d/docker.list
         fi
 
+        echo "$SEP"
         # NodeSource (Node.js LTS)
         if [[ ! -f /etc/apt/sources.list.d/nodesource.sources ]]; then
             echo "Adicionando repositório NodeSource..."
             curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
         fi
 
+        echo "$SEP"
         sudo apt-get update -qq
         echo "Repositórios configurados!"
     fi
 fi
+
+echo "$SEP"
+echo ">>> FIM: 00-install-packages"
+echo "$SEP"

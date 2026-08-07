@@ -1,5 +1,10 @@
 #!/bin/bash
 
+SEP="=================================================="
+echo "$SEP"
+echo ">>> INICIO: 01-install-go-tools"
+echo "$SEP"
+
 # Garante que o Go esteja no PATH para este script
 if [[ -d /opt/homebrew/bin ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -21,6 +26,11 @@ tools=(
 
 echo "Instalando/Atualizando ferramentas Go..."
 for tool in "${tools[@]}"; do
+  echo "$SEP"
   echo "Instalando $tool"
   go install "$tool"
 done
+
+echo "$SEP"
+echo ">>> FIM: 01-install-go-tools"
+echo "$SEP"

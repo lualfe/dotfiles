@@ -1,5 +1,10 @@
 #!/bin/bash
 
+SEP="=================================================="
+echo "$SEP"
+echo ">>> INICIO: 03-install-zsh-plugins"
+echo "$SEP"
+
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   echo "Instalando Oh My Zsh..."
   CHSH=no RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
@@ -9,6 +14,7 @@ ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
 mkdir -p "$ZSH_CUSTOM/plugins"
 mkdir -p "$ZSH_CUSTOM/themes"
 
+echo "$SEP"
 # 1. Instala o tema Powerlevel10k
 # (checa se o dir tem conteúdo, não só se existe: um clone que falhou
 # no meio deixa o dir criado mas vazio, e um `-d` simples nunca mais
@@ -26,6 +32,7 @@ plugins=(
 )
 
 for plugin in "${plugins[@]}"; do
+  echo "$SEP"
   plugin_name=$(basename $plugin)
   plugin_dir="$ZSH_CUSTOM/plugins/$plugin_name"
   if [ ! -d "$plugin_dir" ] || [ -z "$(ls -A "$plugin_dir" 2>/dev/null)" ]; then
@@ -35,6 +42,7 @@ for plugin in "${plugins[@]}"; do
   fi
 done
 
+echo "$SEP"
 # CHSH=no acima pula a troca de shell padrão; no Linux o zsh não vem
 # como shell padrão (diferente do macOS), então define explicitamente.
 # Obs: só vale a partir do próximo login (logout/login ou reboot),
@@ -56,3 +64,7 @@ if [[ "$(uname -s)" == "Linux" ]]; then
     fi
   fi
 fi
+
+echo "$SEP"
+echo ">>> FIM: 03-install-zsh-plugins"
+echo "$SEP"
