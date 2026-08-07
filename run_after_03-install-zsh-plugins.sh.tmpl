@@ -5,11 +5,13 @@ echo ">>> INICIO: 03-install-zsh-plugins"
 echo "DEBUG usuário: $(id -un)"
 echo "DEBUG HOME: $HOME"
 
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-  echo "Instalando Oh My Zsh..."
-  CHSH=no RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-  echo ""
-fi
+# Reinstala do zero sempre (mesmo motivo do tema/plugins abaixo: o
+# instalador oficial recusa rodar se `~/.oh-my-zsh` já existir, então
+# sem o rm -rf aqui a reinstalação forçada nunca aconteceria).
+echo "Instalando Oh My Zsh..."
+rm -rf "$HOME/.oh-my-zsh"
+CHSH=no RUNZSH=no KEEP_ZSHRC=yes sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+echo ""
 
 ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
 echo "DEBUG ZSH_CUSTOM resolvido: $ZSH_CUSTOM"
