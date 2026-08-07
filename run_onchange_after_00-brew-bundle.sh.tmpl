@@ -3,10 +3,7 @@ set -e
 
 # Brewfile hash: {{ include "Brewfile" | sha256sum }}
 
-SEP="=================================================="
-echo "$SEP"
 echo ">>> INICIO: 00-brew-bundle"
-echo "$SEP"
 
 OS="$(uname -s)"
 
@@ -16,6 +13,7 @@ if [[ "$OS" == "Darwin" ]]; then
     fi
     echo "Atualizando pacotes do Homebrew..."
     brew bundle --file={{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
+    echo ""
 
 elif [[ "$OS" == "Linux" ]]; then
     . /etc/os-release
@@ -30,7 +28,6 @@ elif [[ "$OS" == "Linux" ]]; then
             *) GNU_ARCH="$DEB_ARCH" ;;
         esac
 
-        echo "$SEP"
         # Pacotes base (sem exigência de versão específica, apt resolve bem)
         sudo apt-get install -y \
             gcc \
@@ -45,8 +42,8 @@ elif [[ "$OS" == "Linux" ]]; then
             fontconfig \
             fzf \
             pipx
+        echo ""
 
-        echo "$SEP"
         # fd-find (apt fica desatualizado, instala o binário mais recente do GitHub)
         FD_LATEST=$(curl -s "https://api.github.com/repos/sharkdp/fd/releases/latest" \
             | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
@@ -59,16 +56,16 @@ elif [[ "$OS" == "Linux" ]]; then
             tar -xzf /tmp/fd.tar.gz -C /tmp
             sudo install "/tmp/${FD_DIRNAME}/fd" /usr/local/bin/fd
             rm -rf /tmp/fd.tar.gz "/tmp/${FD_DIRNAME}"
+            echo ""
         fi
 
-        echo "$SEP"
         # Pacotes com repositórios externos
         sudo apt-get install -y \
             postgresql-15 \
             kubectl \
             docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        echo ""
 
-        echo "$SEP"
         # Go (apt fica desatualizado, instala o binário oficial mais recente)
         GO_LATEST=$(curl -s "https://go.dev/dl/?mode=json" | grep -m1 '"version"' | sed -E 's/.*"go([^"]+)".*/\1/')
         GO_CURRENT=$(command -v go &> /dev/null && go version | grep -oE 'go[0-9]+\.[0-9]+(\.[0-9]+)?' | sed 's/^go//' || echo "0.0.0")
@@ -81,9 +78,9 @@ elif [[ "$OS" == "Linux" ]]; then
             sudo ln -sf /usr/local/go/bin/go /usr/local/bin/go
             sudo ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
             rm -f /tmp/go.tar.gz
+            echo ""
         fi
 
-        echo "$SEP"
         # neovim (apt fica desatualizado; plugins pedem 0.11+, então instala o binário oficial)
         NVIM_MIN="0.11.0"
         NVIM_CURRENT=$(command -v nvim &> /dev/null && nvim --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0")
@@ -98,9 +95,9 @@ elif [[ "$OS" == "Linux" ]]; then
             sudo mv "/opt/nvim-linux-${NVIM_ARCH}" /opt/nvim
             sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
             rm -f /tmp/nvim.tar.gz
+            echo ""
         fi
 
-        echo "$SEP"
         # lazygit
         if ! command -v lazygit &> /dev/null; then
             echo "Instalando lazygit (arch: $DEB_ARCH)..."
@@ -112,9 +109,9 @@ elif [[ "$OS" == "Linux" ]]; then
             tar -xzf /tmp/lazygit.tar.gz -C /tmp lazygit
             sudo install /tmp/lazygit /usr/local/bin
             rm -f /tmp/lazygit.tar.gz /tmp/lazygit
+            echo ""
         fi
 
-        echo "$SEP"
         # golang-migrate
         if ! command -v migrate &> /dev/null; then
             echo "Instalando golang-migrate (arch: $DEB_ARCH)..."
@@ -123,9 +120,9 @@ elif [[ "$OS" == "Linux" ]]; then
             tar -xzf /tmp/migrate.tar.gz -C /tmp migrate
             sudo install /tmp/migrate /usr/local/bin
             rm -f /tmp/migrate.tar.gz /tmp/migrate
+            echo ""
         fi
 
-        echo "$SEP"
         # rainfrog (danvergara/tools tap → achristmascarl/rainfrog)
         if ! command -v rainfrog &> /dev/null; then
             echo "Instalando rainfrog (arch: $DEB_ARCH)..."
@@ -136,30 +133,30 @@ elif [[ "$OS" == "Linux" ]]; then
             tar -xzf /tmp/rainfrog.tar.gz -C /tmp
             sudo install /tmp/rainfrog /usr/local/bin
             rm -f /tmp/rainfrog.tar.gz /tmp/rainfrog
+            echo ""
         fi
 
-        echo "$SEP"
         # resterm (via go install)
         if command -v go &> /dev/null && ! command -v resterm &> /dev/null; then
             echo "Instalando resterm..."
             go install github.com/unkn0wn-root/resterm/cmd/resterm@latest
+            echo ""
         fi
 
-        echo "$SEP"
         # tree-sitter CLI (via npm)
         if command -v npm &> /dev/null && ! command -v tree-sitter &> /dev/null; then
             echo "Instalando tree-sitter-cli..."
             sudo npm install -g tree-sitter-cli
+            echo ""
         fi
 
-        echo "$SEP"
         # claude-code (via npm)
         if command -v npm &> /dev/null && ! command -v claude &> /dev/null; then
             echo "Instalando claude-code..."
             sudo npm install -g @anthropic-ai/claude-code
+            echo ""
         fi
 
-        echo "$SEP"
         # rio terminal (.deb do GitHub)
         if ! command -v rio &> /dev/null; then
             echo "Instalando rio terminal (arch: $DEB_ARCH)..."
@@ -172,9 +169,9 @@ elif [[ "$OS" == "Linux" ]]; then
             else
                 echo "AVISO: não encontrei o .deb do rio para $DEB_ARCH no último release, pulando." >&2
             fi
+            echo ""
         fi
 
-        echo "$SEP"
         # dbeaver-community (.deb do GitHub)
         if ! dpkg -s dbeaver-ce &> /dev/null; then
             echo "Instalando DBeaver Community (arch: $DEB_ARCH)..."
@@ -187,9 +184,9 @@ elif [[ "$OS" == "Linux" ]]; then
             else
                 echo "AVISO: não encontrei o .deb do DBeaver para $DEB_ARCH no último release, pulando." >&2
             fi
+            echo ""
         fi
 
-        echo "$SEP"
         # Iosevka Nerd Font
         if [[ ! -f "$HOME/.local/share/fonts/IosevkaNerdFont-Regular.ttf" ]]; then
             echo "Instalando Iosevka Nerd Font..."
@@ -199,15 +196,14 @@ elif [[ "$OS" == "Linux" ]]; then
             tar -xJf /tmp/Iosevka.tar.xz -C "$HOME/.local/share/fonts"
             fc-cache -f -v
             rm -f /tmp/Iosevka.tar.xz
+            echo ""
         fi
 
-        echo "$SEP"
         # Deletar Brewfile no Linux
         rm -f "$HOME/Brewfile"
         echo "Instalação Ubuntu concluída!"
     fi
 fi
 
-echo "$SEP"
 echo ">>> FIM: 00-brew-bundle"
-echo "$SEP"
+echo ""

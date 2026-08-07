@@ -3,10 +3,7 @@ set -e
 
 # dot_zshrc hash: {{ include "dot_zshrc" | sha256sum }}
 
-SEP="=================================================="
-echo "$SEP"
 echo ">>> INICIO: 05-cleanup-zshrc-linux"
-echo "$SEP"
 
 if [[ "$(uname -s)" == "Linux" ]]; then
     . /etc/os-release
@@ -19,10 +16,10 @@ if [[ "$(uname -s)" == "Linux" ]]; then
                 -e '/\/home\/linuxbrew/ s/^/# [linux-skip] /' \
                 -e '/\/Applications\//     s/^/# [linux-skip] /' \
                 "$ZSHRC"
+            echo ""
         fi
     fi
 fi
 
-echo "$SEP"
 echo ">>> FIM: 05-cleanup-zshrc-linux"
-echo "$SEP"
+echo ""

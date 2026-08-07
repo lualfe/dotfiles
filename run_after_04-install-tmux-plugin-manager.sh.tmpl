@@ -1,16 +1,13 @@
 #!/bin/bash
 
-SEP="=================================================="
-echo "$SEP"
 echo ">>> INICIO: 04-install-tmux-plugin-manager"
-echo "$SEP"
 
 if [ ! -d "$HOME/.tmux/plugins/tpm" ] || [ -z "$(ls -A "$HOME/.tmux/plugins/tpm" 2>/dev/null)" ]; then
   echo "Instalando Tmux Plugin Manager (TPM)..."
   rm -rf "$HOME/.tmux/plugins/tpm"
   git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+  echo ""
 fi
 
-echo "$SEP"
 echo ">>> FIM: 04-install-tmux-plugin-manager"
-echo "$SEP"
+echo ""
