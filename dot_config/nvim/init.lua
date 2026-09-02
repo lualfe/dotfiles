@@ -16,12 +16,12 @@ vim.opt.cursorline = true
 vim.opt.autoread = true
 
 vim.api.nvim_create_autocmd({"FocusGained", "BufEnter"}, {
-  pattern = "*",
-  command = "checktime",
+	pattern = "*",
+	command = "checktime",
 })
 
-local function ensure_dir(path)
-  vim.fn.mkdir(path, "p")
+local function ensure_dir(path) 
+	vim.fn.mkdir(path, "p")
 end
 
 local swap_dir = vim.fn.expand("~/.local/share/nvim/swap//")

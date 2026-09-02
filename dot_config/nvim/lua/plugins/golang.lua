@@ -42,6 +42,10 @@ return {
 			vim.api.nvim_create_autocmd('LspAttach', {
 				callback = function(args)
 					local buf = args.buf
+					if vim.api.nvim_buf_get_name(buf):match("^octo://") then
+						vim.lsp.buf_detach_client(buf, args.data.client_id)
+						return
+					end
 					vim.keymap.set('n', 'gI', vim.lsp.buf.implementation, { buffer = buf, desc = "Ir para implementação" })
 					vim.keymap.set('n', '<leader>gI', '<cmd>Telescope lsp_implementations<CR>', { buffer = buf, desc = "Telescope implementações" })
 					vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = buf, desc = "Referências" })
@@ -57,6 +61,8 @@ return {
 					vim.opt_local.tabstop = 4
 				end,
 			})
+
+			vim.keymap.set('n', 'gl', vim.diagnostic.open_float)
 		end,
 	},
 	{
@@ -133,7 +139,26 @@ return {
 			vim.api.nvim_create_autocmd("BufWritePre", {
 				pattern = "*.go",
 				callback = function()
-					require('go.format').goimports()
+					local bufnr = vim.api.nvim_get_current_buf()
+					local clients = vim.lsp.get_clients({ bufnr = bufnr, name = "gopls" })
+					if #clients == 0 then
+						return
+					end
+
+					local params = vim.lsp.util.make_range_params(nil, clients[1].offset_encoding)
+					params.context = { only = { "source.organizeImports" } }
+					local result = vim.lsp.buf_request_sync(bufnr, "textDocument/codeAction", params, 1000)
+					for _, res in pairs(result or {}) do
+						for _, action in pairs(res.result or {}) do
+							if action.edit then
+								vim.lsp.util.apply_workspace_edit(action.edit, clients[1].offset_encoding)
+							elseif action.command then
+								vim.lsp.buf.execute_command(action.command)
+							end
+						end
+					end
+
+					vim.lsp.buf.format({ bufnr = bufnr, async = false })
 				end,
 				group = format_sync_grp,
 			})
