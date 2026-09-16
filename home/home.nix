@@ -15,6 +15,11 @@
 
   fonts.fontconfig.enable = !isDarwin;
 
+  # Standalone home-manager on non-NixOS Linux doesn't otherwise add
+  # ~/.nix-profile/share to XDG_DATA_DIRS, so GUI apps' .desktop files
+  # (rio, dbeaver) never show up in the system app menu.
+  targets.genericLinux.enable = !isDarwin;
+
   home.sessionPath = [ "$HOME/go/bin" ];
 
   # CPATH/LIBRARY_PATH are real upstream gcc env vars (unlike
