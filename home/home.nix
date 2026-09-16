@@ -17,10 +17,24 @@
 
   home.sessionPath = [ "$HOME/go/bin" ];
 
-  xdg.configFile."nvim" = {
-    source = ../nvim;
+  # Everything but lazy-lock.json is immutable, symlinked straight from
+  # the store. lazy.nvim rewrites lazy-lock.json as plugins update, and
+  # the store is read-only, so that one file is seeded as a real,
+  # writable copy by the activation script below instead.
+  xdg.configFile."nvim/init.lua".source = ../nvim/init.lua;
+  xdg.configFile."nvim/thisisfine.cat".source = ../nvim/thisisfine.cat;
+  xdg.configFile."nvim/lua" = {
+    source = ../nvim/lua;
     recursive = true;
   };
+
+  home.activation.seedNvimLazyLock = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    target="$HOME/.config/nvim/lazy-lock.json"
+    if [ ! -e "$target" ] || [ -L "$target" ]; then
+      run rm -f "$target"
+      run install -m 644 ${../nvim/lazy-lock.json} "$target"
+    fi
+  '';
 
   xdg.configFile."posting" = {
     source = ../posting;
