@@ -11,9 +11,7 @@ buildGoModule rec {
     hash = "sha256-TjGu8QcwYIPoW2v61fXpq/oZKoksOUZ2/dnleJhPjFM=";
   };
 
-  # Same story as `hash` above: run the build once, copy the real
-  # vendorHash from the error message.
-  vendorHash = lib.fakeHash;
+  vendorHash = "sha256-VVa77h0mgWLEuL2+Q3qre5V71kbBaWaugNN9TcTC8y0=";
 
   meta = {
     description = "SQL language server written in Go";
