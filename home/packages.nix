@@ -15,6 +15,7 @@ with pkgs; [
 
   # cli utilities
   fd
+  fzf
   lazygit
   tree-sitter
   kubectl
