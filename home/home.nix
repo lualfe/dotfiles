@@ -1,4 +1,4 @@
-{ pkgs, lib, username, isDarwin ? pkgs.stdenv.isDarwin, ... }:
+{ config, pkgs, lib, username, isDarwin ? pkgs.stdenv.isDarwin, ... }:
 
 {
   imports = [
@@ -33,39 +33,23 @@
     LIBRARY_PATH = lib.makeLibraryPath [ pkgs.readline pkgs.ncurses ];
   };
 
-  # Everything but lazy-lock.json is immutable, symlinked straight from
-  # the store. lazy.nvim rewrites lazy-lock.json as plugins update, and
-  # the store is read-only, so that one file is seeded as a real,
-  # writable copy by the activation script below instead.
-  xdg.configFile."nvim/init.lua".source = ../nvim/init.lua;
-  xdg.configFile."nvim/thisisfine.cat".source = ../nvim/thisisfine.cat;
-  xdg.configFile."nvim/lua" = {
-    source = ../nvim/lua;
-    recursive = true;
-  };
+  # Symlinked straight to the repo on disk (not copied into the nix
+  # store), so editing files under these paths edits the repo directly
+  # and vice versa - no rebuild needed to pick up changes, and tools
+  # that rewrite their own config (lazy.nvim's lazy-lock.json) can do
+  # so freely since it's a real writable file, not a store path.
+  # Assumes the repo is checked out at ~/dotfiles on every machine.
+  home.file.".config/nvim".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/nvim";
 
-  home.activation.seedNvimLazyLock = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    target="$HOME/.config/nvim/lazy-lock.json"
-    if [ ! -e "$target" ] || [ -L "$target" ]; then
-      run rm -f "$target"
-      run install -m 644 ${../nvim/lazy-lock.json} "$target"
-    fi
-  '';
+  home.file.".config/posting".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/posting";
 
-  xdg.configFile."posting" = {
-    source = ../posting;
-    recursive = true;
-  };
+  home.file.".config/rio".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/rio";
 
-  xdg.configFile."rio" = {
-    source = ../rio;
-    recursive = true;
-  };
-
-  home.file.".claude/skills" = {
-    source = ../claude-skills;
-    recursive = true;
-  };
+  home.file.".claude/skills".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/claude-skills";
 
   programs.home-manager.enable = true;
 }

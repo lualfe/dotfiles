@@ -18,7 +18,11 @@ posting, rio, Claude skills) declaratively. Works on macOS and Ubuntu.
 - `pkgs/` — custom package derivations for tools not in nixpkgs
   (`resterm`, `sqls`).
 - `nvim/`, `posting/`, `rio/`, `claude-skills/`, `p10k.zsh` — the actual
-  dotfile contents, symlinked into place by home-manager.
+  dotfile contents. `nvim`, `posting`, `rio`, `claude-skills` are linked
+  live via `mkOutOfStoreSymlink` (assumes the repo is checked out at
+  `~/dotfiles`), so editing files under `~/.config/nvim` etc. edits this
+  repo directly — no rebuild needed. `p10k.zsh` is still copied into the
+  store by home-manager.
 
 ## First-time setup
 
