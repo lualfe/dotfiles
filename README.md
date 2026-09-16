@@ -68,6 +68,20 @@ Subsequent runs:
 home-manager switch --flake .#x86_64-linux
 ```
 
+Standalone home-manager has no root access, so it can't register the
+nix-provided zsh in `/etc/shells` or change your login shell. One-time
+manual step to make new terminals default to it:
+
+```sh
+which zsh                              # e.g. /home/lualfe/.nix-profile/bin/zsh
+grep -qxF "$(which zsh)" /etc/shells || echo "$(which zsh)" | sudo tee -a /etc/shells
+chsh -s "$(which zsh)"
+```
+
+Log out/in (a new terminal tab isn't enough — it inherits the old login
+shell) for it to take effect. macOS doesn't need this: nix-darwin sets
+the login shell declaratively via `users.users.<name>.shell`.
+
 ## What's NOT managed by Nix (install manually, one-time)
 
 GUI apps with no nixpkgs equivalent, and system daemons that need root

@@ -3,6 +3,7 @@
 with pkgs; [
   # toolchains / compilers
   gcc
+  gnumake
   go
   nodejs
 

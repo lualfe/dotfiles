@@ -11,7 +11,7 @@
   home.stateVersion = "24.11";
 
   home.packages = import ./packages.nix { inherit pkgs; }
-    ++ lib.optionals (!isDarwin) [ pkgs.nerd-fonts.iosevka ];
+    ++ lib.optionals (!isDarwin) [ pkgs.nerd-fonts.iosevka pkgs.xclip ];
 
   fonts.fontconfig.enable = !isDarwin;
 

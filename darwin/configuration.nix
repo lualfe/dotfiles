@@ -7,6 +7,11 @@
 
   system.primaryUser = username;
   users.users.${username}.home = "/Users/${username}";
+  users.users.${username}.shell = pkgs.zsh;
+
+  # Registers the nix-provided zsh in /etc/shells so chsh/dscl accept it.
+  environment.shells = [ pkgs.zsh ];
+  programs.zsh.enable = true;
 
   fonts.packages = [ pkgs.nerd-fonts.iosevka ];
 
