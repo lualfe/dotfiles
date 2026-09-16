@@ -40,6 +40,12 @@
         sqls = final.callPackage ./pkgs/sqls.nix { };
       };
 
+      # `nix build .#resterm` / `.#sqls` — mainly useful for resolving the
+      # placeholder hashes in pkgs/*.nix before the first real switch.
+      packages = nixpkgs.lib.genAttrs (linuxSystems ++ darwinSystems) (system: {
+        inherit (pkgsFor system) resterm sqls;
+      });
+
       # Ubuntu (and any other non-Darwin Linux): standalone home-manager,
       # no root/system changes.
       #   nix run home-manager -- switch --flake .#x86_64-linux
