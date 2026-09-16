@@ -8,9 +8,7 @@ buildGoModule rec {
     owner = "sqls-server";
     repo = "sqls";
     rev = "v${version}";
-    # `nix build` will fail on the first run and print the correct hash;
-    # paste it in here.
-    hash = lib.fakeHash;
+    hash = "sha256-TjGu8QcwYIPoW2v61fXpq/oZKoksOUZ2/dnleJhPjFM=";
   };
 
   # Same story as `hash` above: run the build once, copy the real

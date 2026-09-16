@@ -8,9 +8,7 @@ buildGoModule rec {
     owner = "unkn0wn-root";
     repo = "resterm";
     rev = "v${version}";
-    # `nix build` will fail on the first run and print the correct hash;
-    # paste it in here.
-    hash = lib.fakeHash;
+    hash = "sha256-qIxIUNTYmRsQU6u5MHyVhM89+svEz/6r+HX2Q/glOLk=";
   };
 
   # Same story as `hash` above: run the build once, copy the real
