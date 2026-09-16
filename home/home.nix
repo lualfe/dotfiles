@@ -21,10 +21,11 @@
   # NIX_CFLAGS_COMPILE, which only nixpkgs' cc-wrapper honors), so these
   # work regardless of which gcc ends up on PATH. Needed for ad-hoc
   # native builds some lazy.nvim plugins run on install (e.g. hererocks
-  # compiling its own Lua, which needs readline.h/libreadline).
+  # compiling its own Lua, which needs readline.h/libreadline, which in
+  # turn links against ncurses).
   home.sessionVariables = {
-    CPATH = "${lib.getDev pkgs.readline}/include";
-    LIBRARY_PATH = "${lib.getLib pkgs.readline}/lib";
+    CPATH = lib.makeSearchPathOutput "dev" "include" [ pkgs.readline pkgs.ncurses ];
+    LIBRARY_PATH = lib.makeLibraryPath [ pkgs.readline pkgs.ncurses ];
   };
 
   # Everything but lazy-lock.json is immutable, symlinked straight from
