@@ -17,13 +17,14 @@
 
   home.sessionPath = [ "$HOME/go/bin" ];
 
-  # nixpkgs' gcc wrapper reads these even outside a nix build, so ad-hoc
+  # CPATH/LIBRARY_PATH are real upstream gcc env vars (unlike
+  # NIX_CFLAGS_COMPILE, which only nixpkgs' cc-wrapper honors), so these
+  # work regardless of which gcc ends up on PATH. Needed for ad-hoc
   # native builds some lazy.nvim plugins run on install (e.g. hererocks
-  # compiling its own Lua, which needs readline.h) can still find
-  # headers/libs that don't live in a normal FHS path.
+  # compiling its own Lua, which needs readline.h/libreadline).
   home.sessionVariables = {
-    NIX_CFLAGS_COMPILE = "-I${lib.getDev pkgs.readline}/include";
-    NIX_LDFLAGS = "-L${lib.getLib pkgs.readline}/lib";
+    CPATH = "${lib.getDev pkgs.readline}/include";
+    LIBRARY_PATH = "${lib.getLib pkgs.readline}/lib";
   };
 
   # Everything but lazy-lock.json is immutable, symlinked straight from
