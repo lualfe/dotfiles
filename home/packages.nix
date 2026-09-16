@@ -9,7 +9,7 @@ with pkgs; [
   # go tooling
   gopls
   delve
-  golang-migrate
+  go-migrate
   sqls
 
   # cli utilities
