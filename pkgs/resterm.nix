@@ -11,9 +11,7 @@ buildGoModule rec {
     hash = "sha256-qIxIUNTYmRsQU6u5MHyVhM89+svEz/6r+HX2Q/glOLk=";
   };
 
-  # Same story as `hash` above: run the build once, copy the real
-  # vendorHash from the error message.
-  vendorHash = lib.fakeHash;
+  vendorHash = "sha256-q5DvpQPAvy5TnuhyNiiEF4tcwUQFqCcEdeLzFOXcsko=";
 
   subPackages = [ "cmd/resterm" ];
 
