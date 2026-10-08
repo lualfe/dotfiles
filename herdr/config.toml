@@ -47,3 +47,11 @@ resize_pane_down = "prefix+minus"
 # tmux: bind-key -n C-n / C-p next/previous-window (no prefix)
 next_tab = "ctrl+n"
 previous_tab = "ctrl+p"
+
+# cycle workspaces
+next_workspace = "prefix+n"
+previous_workspace = "prefix+p"
+
+# cycle agents
+next_agent = "prefix+shift+n"
+previous_agent = "prefix+shift+p"
