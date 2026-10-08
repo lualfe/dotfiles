@@ -48,6 +48,13 @@
   home.file.".config/rio".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/rio";
 
+  # Only config.toml is linked, not the whole dir: herdr keeps its logs
+  # and session.json/session-snapshots alongside it in ~/.config/herdr.
+  # herdr's own config edits (onboarding, settings UI) go through
+  # fs::write, which follows the symlink and writes back into the repo.
+  home.file.".config/herdr/config.toml".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/herdr/config.toml";
+
   home.file.".claude/skills".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/claude-skills";
 

@@ -1,0 +1,49 @@
+# herdr config — mirrors the tmux setup in home/programs/tmux.nix.
+# Reload a running server with `prefix+r` or `herdr server reload-config`.
+# Full reference: `herdr --default-config` / https://herdr.dev/docs/config-reference/
+
+onboarding = false
+
+[theme]
+name = "dracula"
+
+[ui]
+tab_bar_position = "top"
+tab_bar_right = [
+  { type = "zoom" },
+  { type = "command", command = "whoami", interval_seconds = 3600 },
+  { type = "datetime", format = "%d/%m/%Y %H:%M" },
+]
+tab_bar_right_separator = " | "
+
+[keys]
+# tmux: prefix C-a (pressing it twice sends a literal C-a, like send-prefix)
+prefix = "ctrl+a"
+
+# tmux: bind r source-file ~/.tmux.conf
+reload_config = "prefix+r"
+# resize mode moves off prefix+r to make room for reload
+resize_mode = "prefix+shift+r"
+
+# tmux: bind-key & kill-window
+close_tab = "prefix+&"
+
+# tmux: bind | split-window -h (side by side) / bind _ split-window -v (stacked)
+split_vertical = "prefix+|"
+split_horizontal = "prefix+_"
+
+# tmux: bind -n C-h/j/k/l select-pane (no prefix)
+focus_pane_left = "ctrl+h"
+focus_pane_down = "ctrl+j"
+focus_pane_up = "ctrl+k"
+focus_pane_right = "ctrl+l"
+
+# tmux: bind < > + - resize-pane
+resize_pane_left = "prefix+<"
+resize_pane_right = "prefix+>"
+resize_pane_up = "prefix+plus"
+resize_pane_down = "prefix+minus"
+
+# tmux: bind-key -n C-n / C-p next/previous-window (no prefix)
+next_tab = "ctrl+n"
+previous_tab = "ctrl+p"

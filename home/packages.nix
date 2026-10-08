@@ -32,6 +32,7 @@ with pkgs; [
   # editors / terminals
   neovim
   rio
+  herdr
 
   # python tooling (replaces the old pipx-managed tools)
   sqlfluff

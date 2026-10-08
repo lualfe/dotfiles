@@ -1,8 +1,8 @@
 # dotfiles
 
 Nix flake replacing the old chezmoi setup. Manages CLI tooling (via
-nixpkgs, no more Brewfile/apt-branching) and dotfiles (zsh, tmux, nvim,
-posting, rio, Claude skills) declaratively. Works on macOS and Ubuntu.
+nixpkgs, no more Brewfile/apt-branching) and dotfiles (zsh, tmux, herdr,
+nvim, posting, rio, Claude skills) declaratively. Works on macOS and Ubuntu.
 
 ## Layout
 
@@ -17,12 +17,14 @@ posting, rio, Claude skills) declaratively. Works on macOS and Ubuntu.
     home-manager plugin management.
 - `pkgs/` — custom package derivations for tools not in nixpkgs
   (`resterm`, `sqls`).
-- `nvim/`, `posting/`, `rio/`, `claude-skills/`, `p10k.zsh` — the actual
-  dotfile contents. `nvim`, `posting`, `rio`, `claude-skills` are linked
-  live via `mkOutOfStoreSymlink` (assumes the repo is checked out at
-  `~/dotfiles`), so editing files under `~/.config/nvim` etc. edits this
-  repo directly — no rebuild needed. `p10k.zsh` is still copied into the
-  store by home-manager.
+- `nvim/`, `posting/`, `rio/`, `herdr/`, `claude-skills/`, `p10k.zsh` —
+  the actual dotfile contents. `nvim`, `posting`, `rio`, `claude-skills`
+  are linked live via `mkOutOfStoreSymlink` (assumes the repo is checked
+  out at `~/dotfiles`), so editing files under `~/.config/nvim` etc. edits
+  this repo directly — no rebuild needed. For herdr only
+  `~/.config/herdr/config.toml` is linked (its logs and session state
+  live in the same dir). `p10k.zsh` is still copied into the store by
+  home-manager.
 
 ## First-time setup
 
