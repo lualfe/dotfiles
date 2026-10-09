@@ -49,9 +49,9 @@ next_tab = "ctrl+n"
 previous_tab = "ctrl+p"
 
 # cycle workspaces
-next_workspace = "ctrl+shift+n"
-previous_workspace = "ctrl+shift+p"
+next_workspace = "prefix+alt+w"
+previous_workspace = "prefix+alt+s"
 
 # cycle agents
-next_agent = "ctrl+alt+n"
-previous_agent = "ctrl+alt+p"
+next_agent = "prefix+alt+n"
+previous_agent = "prefix+alt+p"
